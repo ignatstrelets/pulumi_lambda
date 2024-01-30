@@ -6,11 +6,15 @@ import (
 	"github.com/pulumi/pulumi-aws-apigateway/sdk/v2/go/apigateway"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/iam"
 	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/lambda"
+	"github.com/pulumi/pulumi-aws/sdk/v6/go/aws/ec2"
 	"github.com/pulumi/pulumi/sdk/v3/go/pulumi"
 )
 
 func main() {
 	pulumi.Run(func(ctx *pulumi.Context) error {
+
+                config := ctx.Config()
+
 		policy, err := json.Marshal(map[string]interface{}{
 			"Version": "2012-10-17",
 			"Statement": []map[string]interface{}{
@@ -31,8 +35,8 @@ func main() {
 			AssumeRolePolicy: pulumi.String(policy),
 			ManagedPolicyArns: pulumi.StringArray{
 				iam.ManagedPolicyAWSLambdaBasicExecutionRole,
-				customVpcPolicy,
-				customSecretsManagerPolicy,
+				config.Get("customVpcPolicy"),
+				config.Get("customSecretsManagerPolicy"),
 			},
 		})
 		if err != nil {
@@ -40,7 +44,7 @@ func main() {
 		}
 
                 lambdaSg, err := ec2.NewSecurityGroup(ctx, "lambdaSecurityGroup", &ec2.SecurityGroupArgs{
-                        VpcId: customVpcId,
+                        VpcId: config.Get("customVpcId"),
                         Ingress: ec2.SecurityGroupIngressArray{
                                 ec2.SecurityGroupIngressArgs{
                                         Protocol:    pulumi.String("tcp"),
@@ -55,7 +59,7 @@ func main() {
                                         Protocol:   pulumi.String("-1"),
                                         FromPort:   pulumi.Int(0),
                                         ToPort:     pulumi.Int(0),
-                                        SecurityGroups: pulumi.StringArray{defaultSgId},
+                                        SecurityGroups: pulumi.StringArray{config.Get("defaultSgId")},
                                         Description: pulumi.String("Allow all outbound traffic to VPC"),
                                 },
                         },
@@ -67,12 +71,12 @@ func main() {
 			Role:    role.Arn,
 			Code:    pulumi.NewFileArchive("./LambdaDotnet.zip"),
 			VpcConfig: &lambda.FunctionVpcConfigArgs{
-				SubnetIds:        pulumi.StringArray(subnetPublicA, subnetPrivateA, subnetPrivateB),
+				SubnetIds:        pulumi.StringArray(config.Get("subnetPublicA"), config.Get("subnetPrivateA"), config.Get("subnetPrivateB")),
 				SecurityGroupIds: pulumi.StringArray{pulumi.String(lambdaSg.ID())},
 			},
 			Environment: &lambda.FunctionEnvironmentArgs{
 				Variables: pulumi.StringMap{
-					"SECRET_NAME": secretName,
+					"SECRET_NAME": config.GetSecret("secretName"),
 				},
 			},
 		})
@@ -92,7 +96,7 @@ func main() {
 		}
 
 		rdsSg, err := ec2.NewSecurityGroup(ctx, "rdsSecurityGroup", &ec2.SecurityGroupArgs{
-			VpcId: customVpcId,
+			VpcId: config.Get("customVpcId"),
 			Ingress: ec2.SecurityGroupIngressArray{
 				ec2.SecurityGroupIngressArgs{
 					Protocol:    pulumi.String("tcp"),
@@ -117,7 +121,7 @@ func main() {
                 }
 
 		subnetGroup, err := rds.NewSubnetGroup(ctx, "dbSubnetGroup", &rds.SubnetGroupArgs{
-			SubnetIds: pulumi.StringArray(subnetPrivateA, subnetPrivateB),
+			SubnetIds: pulumi.StringArray(config.Get("subnetPrivateA"), config.Get("subnetPrivateB")),
 		})
                 if err != nil {
                         return err
@@ -130,8 +134,8 @@ func main() {
 			EngineVersion:       pulumi.String("14.10"),
 			InstanceClass:       pulumi.String("db.t3.micro"),
 			Name:                pulumi.String("dotnet-psql"),
-			Username:            pulumi.String(dbUsername),
-			Password:            pulumi.String(dbPassword), 
+			Username:            pulumi.String(config.Get("dbUsername")),
+			Password:            pulumi.String(config.GetSecret("dbPassword")), 
 			SkipFinalSnapshot:   pulumi.Bool(true),
 			DbSubnetGroupName:   subnetGroup.Name,
 			VpcSecurityGroupIds: pulumi.StringArray{pulumi.String(rdsSg.ID())},

@@ -3,6 +3,9 @@ config:
   dotnet-lambda-deployment:customSecretsManagerPolicy: arn:aws:iam::aws:policy/SecretsManagerReadWrite
   dotnet-lambda-deployment:customVpcId: vpc-0bee1c0b603c194b2
   dotnet-lambda-deployment:customVpcPolicy: arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+  dotnet-lambda-deployment:dbPassword:
+    secure: AAABAExZCiTLGCcTzLOC8tCRXhNPllFhugsF+Q+paKhjbMpKoTQ9ow==
+  dotnet-lambda-deployment:dbUsername: postgres
   dotnet-lambda-deployment:defaultSgId: sg-06bfa672db225dc7f
   dotnet-lambda-deployment:secretName:
     secure: AAABALxB+FJwtEQcFGxj35iHCFGf6+Pd3vrHRPXob3yQXGA4003KJjkbDrcw9fjtjm0w/pE=
