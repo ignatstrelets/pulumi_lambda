@@ -1,14 +1,14 @@
 config:
-  aws:region: eu-north-1
-  dotnet-lambda-deployment:customSecretsManagerPolicy: arn:aws:iam::aws:policy/SecretsManagerReadWrite
-  dotnet-lambda-deployment:customVpcId: vpc-0bee1c0b603c194b2
-  dotnet-lambda-deployment:customVpcPolicy: arn:aws:iam::aws:policy/service-role/AWSLambdaVPCAccessExecutionRole
+  aws:region: <aws-region>
+  dotnet-lambda-deployment:customSecretsManagerPolicy: <customSecretsManagerPolicy>
+  dotnet-lambda-deployment:customVpcId: <customVpcId>
+  dotnet-lambda-deployment:customVpcPolicy: <customVpcPolicy>
   dotnet-lambda-deployment:dbPassword:
     secure: AAABAExZCiTLGCcTzLOC8tCRXhNPllFhugsF+Q+paKhjbMpKoTQ9ow==
-  dotnet-lambda-deployment:dbUsername: postgres
-  dotnet-lambda-deployment:defaultSgId: sg-06bfa672db225dc7f
+  dotnet-lambda-deployment:dbUsername: <dbUsername>
+  dotnet-lambda-deployment:defaultSgId: <defaultSgId>
   dotnet-lambda-deployment:secretName:
     secure: AAABALxB+FJwtEQcFGxj35iHCFGf6+Pd3vrHRPXob3yQXGA4003KJjkbDrcw9fjtjm0w/pE=
-  dotnet-lambda-deployment:subnetPrivateA: subnet-045ddaf226e0b5480
-  dotnet-lambda-deployment:subnetPrivateB: subnet-0d4f69357751bf4e7
-  dotnet-lambda-deployment:subnetPublicA: subnet-0c265c5f37c1a6dde
+  dotnet-lambda-deployment:subnetPrivateA: <subnetPrivateA>
+  dotnet-lambda-deployment:subnetPrivateB: <subnetPrivateB>
+  dotnet-lambda-deployment:subnetPublicA: <subnetPublicA>
